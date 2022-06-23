@@ -1,0 +1,14 @@
+[Unit]
+Description=Unmanarc TCP/IP Local Port Publisher Server
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+WorkingDirectory=/tmp
+ExecStart=/usr/bin/uTCPIPPublisher -s /etc/uTCPIPPublisher
+Environment=
+
+[Install]
+WantedBy=multi-user.target

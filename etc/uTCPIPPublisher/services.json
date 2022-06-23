@@ -1,0 +1,14 @@
+[
+        {
+            "serviceName": "Remote HTTP Port",
+            "serviceAuthKey" : "PSK1122334455667788",
+            "listenAddr" : "0.0.0.0",
+            "listenPort" : 10080
+        },
+        {
+            "serviceName": "Remote SSH Port",
+            "serviceAuthKey" : "PSK2233445566778899",
+            "listenAddr" : "0.0.0.0",
+            "listenPort" : 10022
+        }
+]
