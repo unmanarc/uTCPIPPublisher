@@ -109,6 +109,7 @@ In the server mode, the `Logs` section control the output of the application, th
 - `serviceAuthKey` is also a relevant PSK, it should be unique on each service, don't repeat them, if you fail to protect this value, and with the .ini PSK, anyone can publish you a service on that port, and anyone can also connect to your published port in your private infrastructure using a mitm attack.
 - `listenAddr` will listen on that address in your server computer
 - `listenPort` will listen on that port in your server computer, if you introduce 0 (zero), it will listen at any available port.
+- IMPORTANT: to avoid any potential data leak, don't forget to keep all the configuration files with RW------- permission (chmod 600).
 
 
 ### Client Mode
