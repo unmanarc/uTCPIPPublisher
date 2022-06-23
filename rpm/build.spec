@@ -92,14 +92,14 @@ chmod 644 $RPM_BUILD_ROOT/usr/lib/systemd/system/utcpippubclient.service
 chmod 644 $RPM_BUILD_ROOT/usr/lib/systemd/system/utcpippubserver.service
 chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/client_config.ini
 chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/server_config.ini
-chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/services.ini
+chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/services.json
 
 %files
 %doc
 %{_bindir}/uTCPIPPublisher
 %config(noreplace) /etc/uTCPIPPublisher/client_config.ini
 %config(noreplace) /etc/uTCPIPPublisher/server_config.ini
-%config(noreplace) /etc/uTCPIPPublisher/services.ini
+%config(noreplace) /etc/uTCPIPPublisher/services.json
 
 /usr/lib/systemd/system/utcpippubclient.service
 /usr/lib/systemd/system/utcpippubserver.service
