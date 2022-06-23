@@ -90,6 +90,9 @@ cp usr/lib/systemd/system/utcpippubserver.service $RPM_BUILD_ROOT/usr/lib/system
 cp usr/lib/systemd/system/utcpippubclient.service $RPM_BUILD_ROOT/usr/lib/systemd/system/utcpippubclient.service
 chmod 644 $RPM_BUILD_ROOT/usr/lib/systemd/system/utcpippubclient.service
 chmod 644 $RPM_BUILD_ROOT/usr/lib/systemd/system/utcpippubserver.service
+chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/client_config.ini
+chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/server_config.ini
+chmod 600 $RPM_BUILD_ROOT/etc/uTCPIPPublisher/services.ini
 
 %files
 %doc
