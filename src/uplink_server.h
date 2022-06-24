@@ -46,15 +46,23 @@ struct sServiceUplinkConnectionPool
     sUplinkServiceConnection getConnectionUplink()
     {
         sUplinkServiceConnection r;
-        std::unique_lock<std::mutex> lk(mt);
-        while (pool.empty())
+        auto now = std::chrono::system_clock::now();
+        while (1)
         {
-            if (cond_notEmpty.wait_for(lk, std::chrono::milliseconds( Globals::getLC_ServerNoConnectionInPoolTimeoutMS() )) == std::cv_status::timeout)
+            std::unique_lock<std::mutex> lk(mt);
+            while (pool.empty())
+            {
+                if (cond_notEmpty.wait_until(lk, now + std::chrono::milliseconds( Globals::getLC_ServerNoConnectionInPoolTimeoutMS() )) == std::cv_status::timeout)
+                    return r;
+            }
+
+            r = pool.front();
+            pool.pop();
+
+            // If the connection pings, return the connection, if not, lock again until the time for leave...
+            if (r.ping())
                 return r;
         }
-        r = pool.front();
-        pool.pop();
-        return r;
     }
 
     void pingerGC()
