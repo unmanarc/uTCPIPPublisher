@@ -101,6 +101,25 @@ bool Uplink_Server::addPublishedServiceConnectionPool(const std::string &poolNam
     return true;
 }
 
+void Uplink_Server::poolMonitorGCThread()
+{
+    pthread_setname_np(pthread_self(), "U:poolGCThread");
+
+    for (;;)
+    {
+        for (const auto & pool : publishedServicesConnectionUplinkPool)
+        {
+            pool.second->pingerGC();
+        }
+        sleep(Globals::getLC_ServerGCPeriod());
+    }
+}
+
+void Uplink_Server::startPoolMonitorGC()
+{
+    thread(poolMonitorGCThread).detach();
+}
+
 sServiceUplinkConnectionPool * Uplink_Server::getPublishedServiceConnectionPool(const std::string &poolName)
 {
     if (publishedServicesConnectionUplinkPool.find(poolName) == publishedServicesConnectionUplinkPool.end())

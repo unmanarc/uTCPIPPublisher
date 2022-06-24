@@ -2,13 +2,15 @@
 #define UPLINK_SERVER_H
 
 #include "service_server.h"
+#include "globals.h"
+
+#include <inttypes.h>
 
 #include <condition_variable>
 #include <mutex>
 #include <queue>
 #include <map>
 #include <mdz_net_sockets/socket_tcp.h>
-//#include <mdz_net_chains/chainsockets.h>
 
 struct sUplinkServiceConnection
 {
@@ -17,7 +19,24 @@ struct sUplinkServiceConnection
         this->upCntId = uplinkId;
         this->uplinkSocket = uplinkSocket;
     }
-    //Mantids::Network::Chains::ChainSockets * uplinkSocket;
+
+    bool ping()
+    {
+        if (!this->uplinkSocket)
+            return false;
+
+        if (!this->uplinkSocket->writeU<uint8_t>(7) || this->uplinkSocket->readU<uint8_t>()!=7)
+        {
+            Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "[upCntId=0x%08" PRIX64 "] Uplink connection is not responding to ping, aborting...");
+
+            // Bad ping, close the socket and remove this object...
+            delete this->uplinkSocket;
+            this->uplinkSocket = nullptr;
+            return false;
+        }
+        return true;
+    }
+
     Mantids::Network::Streams::StreamSocket * uplinkSocket;
     uint64_t upCntId;
 };
@@ -30,14 +49,28 @@ struct sServiceUplinkConnectionPool
         std::unique_lock<std::mutex> lk(mt);
         while (pool.empty())
         {
-            // TODO: change ms...
-            if (cond_notEmpty.wait_for(lk, std::chrono::milliseconds(10000)) == std::cv_status::timeout)
+            if (cond_notEmpty.wait_for(lk, std::chrono::milliseconds( Globals::getLC_ServerNoConnectionInPoolTimeoutMS() )) == std::cv_status::timeout)
                 return r;
         }
         r = pool.front();
         pool.pop();
         return r;
     }
+
+    void pingerGC()
+    {
+        std::unique_lock<std::mutex> lk(mt);
+        std::queue<sUplinkServiceConnection> scrubbedPool;
+        while (!pool.empty())
+        {
+            sUplinkServiceConnection r = pool.front();
+            pool.pop();
+            if (r.ping())
+                scrubbedPool.push(r);
+        }
+        pool = scrubbedPool;
+    }
+
     void addConnectionUplink(sUplinkServiceConnection connection)
     {
         std::unique_lock<std::mutex> lk(mt);
@@ -62,13 +95,17 @@ public:
     // Published services:
     static sServiceUplinkConnectionPool * getPublishedServiceConnectionPool(const std::string & poolName);
     static bool addPublishedServiceConnectionPool(const std::string &poolName, sServiceUplinkConnectionPool * pool);
-    static void startPublishedServices();
-
     static std::atomic<uint64_t> serviceConnectionId;
 
+    static void poolMonitorGCThread();
+
 private:
+    static void startPoolMonitorGC();
+    static void startPublishedServices();
+
     static std::map<std::string,sServiceUplinkConnectionPool *> publishedServicesConnectionUplinkPool;
     static std::atomic<uint64_t> uplinkId;
 };
 
 #endif // UPLINK_SERVER_H
+

@@ -46,6 +46,16 @@ public:
         return pLocalConfig.get<uint16_t>("Server.PoolSize",10);
     }
 
+    static uint16_t getLC_ServerGCPeriod()
+    {
+        return pLocalConfig.get<uint16_t>("Server.GCPeriodSecs",20);
+    }
+
+    static uint16_t getLC_ServerNoConnectionInPoolTimeoutMS()
+    {
+        return pLocalConfig.get<uint16_t>("Server.NoConnectionInPoolTimeoutMSecs",5000);
+    }
+
     static std::string getLC_ServerPSK()
     {
         return pLocalConfig.get<std::string>("Server.PSK","");

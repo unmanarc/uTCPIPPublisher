@@ -74,6 +74,8 @@ Port=12389
 Host=0.0.0.0
 PSK=AABBCCDDEEFF00112233
 Services=services.json
+NoConnectionInPoolTimeoutMSecs=10000
+GCPeriodSecs=20
 ```
 
 
@@ -84,6 +86,10 @@ In the server mode, the `Logs` section control the output of the application, th
 - `Host` will be the listening IPv4 address on the server machine to receive the connections from the clients, 0.0.0.0 will listen on any interface, and it should be reachable from the client network.
 
 - `PSK` will be used by any of the clients to encrypt the communication with the server. Warning: if the PSK is leaked/compromised, an attacker would be able to eavesdrop the underlying connection. however, if the connection itself is properly encrypted (eg. HTTPS), the data integrity and confidentiality should be kept protected.
+
+- `NoConnectionInPoolTimeoutMSecs` is the wait time in milli seconds for a connection to abort if no uplink is found
+
+- `GCPeriodSecs` is the wait time between garbage collection process, the garbage collector will try to ping every connection to determine if is available or not, if not, the connection is removed from the pool.
 
 - The service file (json) should be configured as follows:
 
@@ -149,9 +155,11 @@ In the client mode, the `Logs` section control the output of the application, th
 
 -In the `Client` section, you will describe the service name and authorization key (service level authentication), and the exposed host (can be in localhost, or anywhere in your network)
 
+***
 
+### TODO:
 
-
+- Define multiple PSK per server
 
 
 
