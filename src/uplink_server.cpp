@@ -124,7 +124,7 @@ void Uplink_Server::poolMonitorGCThread()
 
         finish = chrono::high_resolution_clock::now();
         elapsed = finish - start;
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG, "Connection Garbage Collector finished after %f", elapsed.count());
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG, "Connection Garbage Collector finished after %fms", elapsed.count());
         sleep(Globals::getLC_ServerGCPeriod());
     }
 }
