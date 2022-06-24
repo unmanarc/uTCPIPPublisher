@@ -38,7 +38,9 @@ void Uplink_Client::startUplinkClients()
 
 void Uplink_Client::uplinkClientThread()
 {
+#ifndef WIN32
     pthread_setname_np(pthread_self(), "U:clientThr");
+#endif
 
     for (;;)
     {

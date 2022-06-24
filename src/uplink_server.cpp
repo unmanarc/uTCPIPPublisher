@@ -30,7 +30,9 @@ Uplink_Server::Uplink_Server()
 
 bool Uplink_Server::uplinkClientHdlr(void * obj, StreamSocket * baseClientSocket, const char * remotePair, bool secure)
 {
+#ifndef WIN32
     pthread_setname_np(pthread_self(), "U:clientThrSrv");
+#endif
     uint64_t curUplinkId = uplinkId++;
 
     Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG, "[upCntId=0x%08" PRIX64 "] Connection uplink received from %s",curUplinkId, remotePair  );
@@ -103,7 +105,9 @@ bool Uplink_Server::addPublishedServiceConnectionPool(const std::string &poolNam
 
 void Uplink_Server::poolMonitorGCThread()
 {    
+#ifndef WIN32
     pthread_setname_np(pthread_self(), "U:poolGCThread");
+#endif
 
     for (;;)
     {

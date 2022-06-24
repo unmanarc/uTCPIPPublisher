@@ -46,7 +46,9 @@ bool Service_Server::serviceStart()
 
 bool Service_Server::pubClientHandler(void *obj, Mantids::Network::Streams::StreamSocket *baseClientSocket, const char *remotePair, bool secure)
 {
+#ifndef WIN32
     pthread_setname_np(pthread_self(), "S:pubClientHdlr");
+#endif
 
     uint64_t cntId = Uplink_Server::serviceConnectionId++;
 
