@@ -102,15 +102,25 @@ bool Uplink_Server::addPublishedServiceConnectionPool(const std::string &poolNam
 }
 
 void Uplink_Server::poolMonitorGCThread()
-{
+{    
     pthread_setname_np(pthread_self(), "U:poolGCThread");
 
     for (;;)
     {
+
+        auto start = chrono::high_resolution_clock::now();
+        auto finish = chrono::high_resolution_clock::now();
+        chrono::duration<double, milli> elapsed = finish - start;
+
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG, "Starting Connection Garbage Collector");
         for (const auto & pool : publishedServicesConnectionUplinkPool)
         {
             pool.second->pingerGC();
         }
+
+        finish = chrono::high_resolution_clock::now();
+        elapsed = finish - start;
+        Globals::getAppLog()->log0(__func__,Logs::LEVEL_DEBUG, "Connection Garbage Collector finished after %f", elapsed.count());
         sleep(Globals::getLC_ServerGCPeriod());
     }
 }
@@ -132,6 +142,7 @@ void Uplink_Server::uplinkServerStart()
     serviceConnectionId = 1;
     uplinkId = 1;
 
+    startPoolMonitorGC();
     startPublishedServices();
 
     Acceptors::Socket_Acceptor_MultiThreaded * vClientAcceptor = new Acceptors::Socket_Acceptor_MultiThreaded();
