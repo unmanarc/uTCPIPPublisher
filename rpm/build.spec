@@ -1,5 +1,5 @@
 %define name uTCPIPPublisher
-%define version 1.0.0
+%define version 1.0.1
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 
 Name:           %{name}
