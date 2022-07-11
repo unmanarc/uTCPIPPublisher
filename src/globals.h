@@ -9,6 +9,9 @@
 #include <list>
 
 #define ENCRYPTED 1
+#define APPLOG Globals::getAppLog()
+
+#define LOG_APP Globals::getAppLog()
 
 class Globals : public Config_LocalIni
 {

@@ -9,7 +9,7 @@ public:
     Service_Server();
 
     bool serviceStart(  );
-    static bool pubClientHandler(void * obj, Mantids::Network::Streams::StreamSocket * baseClientSocket, const char * remotePair, bool secure);
+    static bool pubClientHandler(void * obj, Mantids::Network::Sockets::Socket_StreamBase * baseClientSocket, const char * remotePair, bool secure);
 
 
     const std::string &getPoolName() const;

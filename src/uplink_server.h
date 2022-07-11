@@ -14,7 +14,7 @@
 
 struct sUplinkServiceConnection
 {
-    sUplinkServiceConnection(uint64_t uplinkId=0,Mantids::Network::Streams::StreamSocket * uplinkSocket = nullptr)
+    sUplinkServiceConnection(uint64_t uplinkId=0,Mantids::Network::Sockets::Socket_StreamBase * uplinkSocket = nullptr)
     {
         this->upCntId = uplinkId;
         this->uplinkSocket = uplinkSocket;
@@ -27,7 +27,7 @@ struct sUplinkServiceConnection
 
         if (!this->uplinkSocket->writeU<uint8_t>(7) || this->uplinkSocket->readU<uint8_t>()!=7)
         {
-            Globals::getAppLog()->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "[upCntId=0x%08" PRIX64 "] Uplink connection is not responding to ping, aborting...");
+            LOG_APP->log0(__func__,Mantids::Application::Logs::LEVEL_WARN, "[upCntId=0x%08" PRIX64 "] Uplink connection is not responding to ping, aborting...");
 
             // Bad ping, close the socket and remove this object...
             delete this->uplinkSocket;
@@ -37,7 +37,7 @@ struct sUplinkServiceConnection
         return true;
     }
 
-    Mantids::Network::Streams::StreamSocket * uplinkSocket;
+    Mantids::Network::Sockets::Socket_StreamBase * uplinkSocket;
     uint64_t upCntId;
 };
 
@@ -98,7 +98,7 @@ public:
     Uplink_Server();
     // Uplink:
     static void uplinkServerStart();
-    static bool uplinkClientHdlr(void * obj, Mantids::Network::Streams::StreamSocket * baseClientSocket, const char * remotePair, bool secure);
+    static bool uplinkClientHdlr(void * obj, Mantids::Network::Sockets::Socket_StreamBase * baseClientSocket, const char * remotePair, bool secure);
 
     // Published services:
     static sServiceUplinkConnectionPool * getPublishedServiceConnectionPool(const std::string & poolName);

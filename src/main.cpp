@@ -24,7 +24,7 @@ public:
 
     void _shutdown()
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "SIGTERM received.");
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO, "SIGTERM received.");
     }
 
     void _initvars(int argc, char *argv[], Arguments::GlobalArguments * globalArguments)
@@ -37,8 +37,8 @@ public:
         globalArguments->setEmail("aaron@unmanarc.com");
         globalArguments->setDescription(PROJECT_DESCRIPTION);
 
-        globalArguments->addCommandLineOption("Client Options", 'c', "client-config" ,   "Client Configuration File"  , "", Mantids::Memory::Abstract::TYPE_STRING );
-        globalArguments->addCommandLineOption("Server Options", 's', "server-dir" ,      "Configuration directory with server_config.ini inside"  , "/etc/uTCPIPPublisher", Mantids::Memory::Abstract::TYPE_STRING );
+        globalArguments->addCommandLineOption("Client Options", 'c', "client-config" ,   "Client Configuration File"  , "", Mantids::Memory::Abstract::Var::TYPE_STRING );
+        globalArguments->addCommandLineOption("Server Options", 's', "server-dir" ,      "Configuration directory with server_config.ini inside"  , "/etc/uTCPIPPublisher", Mantids::Memory::Abstract::Var::TYPE_STRING );
     }
 
     void loadServiceFile(const std::string &filePath)
@@ -114,18 +114,18 @@ public:
         if ( Globals::getLC_LogsUsingSyslog() ) logMode|=Logs::MODE_SYSLOG;
 
         Globals::setAppLog(new Logs::AppLog(logMode));
-        Globals::getAppLog()->setPrintEmptyFields(true);
-        Globals::getAppLog()->setUsingColors(Globals::getLC_LogsShowColors());
-        Globals::getAppLog()->setUsingPrintDate(Globals::getLC_LogsShowDate());
-        Globals::getAppLog()->setModuleAlignSize(26);
-        Globals::getAppLog()->setUsingAttributeName(false);
-        Globals::getAppLog()->setDebug(Globals::getLC_LogsDebug());
+        LOG_APP->setPrintEmptyFields(true);
+        LOG_APP->setUsingColors(Globals::getLC_LogsShowColors());
+        LOG_APP->setUsingPrintDate(Globals::getLC_LogsShowDate());
+        LOG_APP->setModuleAlignSize(26);
+        LOG_APP->setUsingAttributeName(false);
+        LOG_APP->setDebug(Globals::getLC_LogsDebug());
 
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Configuration file loaded.");
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Configuration file loaded.");
 
         if (!clientMode)
         {
-            Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO, "Loading published services definitions...");
+            LOG_APP->log0(__func__,Logs::LEVEL_INFO, "Loading published services definitions...");
             loadServiceFile(Globals::getLC_ServerServicesFile());
         }
 

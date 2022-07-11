@@ -3,16 +3,16 @@
 
 #include <inttypes.h>
 
-#include <mdz_net_sockets/streamsocketsbridge.h>
-#include <mdz_net_sockets/socket_acceptor_multithreaded.h>
-#include <mdz_net_sockets/streamsocketsbridge.h>
+#include <mdz_net_sockets/streams_bridge.h>
+#include <mdz_net_sockets/acceptor_multithreaded.h>
+#include <mdz_net_sockets/streams_bridge.h>
 #include <thread>
 
 #include "uplink_server.h"
 
 using namespace Mantids::Application;
 using namespace Mantids::Network::Sockets;
-using namespace Mantids::Network::Streams;
+using namespace Mantids::Network::Sockets::NetStreams;
 using namespace std;
 
 // TODO: limpiador del pool...
@@ -22,20 +22,20 @@ Service_Server::Service_Server()
 
 bool Service_Server::serviceStart()
 {
-    Acceptors::Socket_Acceptor_MultiThreaded * vClientAcceptor = new Acceptors::Socket_Acceptor_MultiThreaded();
+    Acceptors::MultiThreaded * vClientAcceptor = new Acceptors::MultiThreaded();
 
     // Clean TCP Server (no chains)
     Socket_TCP * tcpServer = new Socket_TCP;
     if (!tcpServer->listenOn(port,listeningHost.c_str(),true))
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_ERR,"Failed to create published service TCP listener @%s:%" PRIu16,
+        LOG_APP->log0(__func__,Logs::LEVEL_ERR,"Failed to create published service TCP listener @%s:%" PRIu16,
                                    listeningHost.c_str(),port);
         delete vClientAcceptor;
         delete tcpServer;
         return false;
     }
 
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"Published TCP/IP Service '%s' listening at %s:%" PRIu16 "...", poolName.c_str(), listeningHost.c_str(),tcpServer->getPort());
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO,"Published TCP/IP Service '%s' listening at %s:%" PRIu16 "...", poolName.c_str(), listeningHost.c_str(),tcpServer->getPort());
 
     // STREAM MANAGER:
     vClientAcceptor->setAcceptorSocket(tcpServer);
@@ -44,7 +44,7 @@ bool Service_Server::serviceStart()
     return true;
 }
 
-bool Service_Server::pubClientHandler(void *obj, Mantids::Network::Streams::StreamSocket *baseClientSocket, const char *remotePair, bool secure)
+bool Service_Server::pubClientHandler(void *obj, Mantids::Network::Sockets::Socket_StreamBase *baseClientSocket, const char *remotePair, bool secure)
 {
 #ifndef WIN32
     pthread_setname_np(pthread_self(), "S:pubClientHdlr");
@@ -54,13 +54,13 @@ bool Service_Server::pubClientHandler(void *obj, Mantids::Network::Streams::Stre
 
     Service_Server * servServer = (Service_Server *)obj;
     Socket_TCP * tcp = (Socket_TCP *)baseClientSocket;
-    Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"[cntId=0x%08" PRIX64 "] Received TCP/IP connection from '%s' to published service %s:%" PRIu16,cntId, remotePair,servServer->getListeningHost().c_str(),servServer->getPort() );
+    LOG_APP->log0(__func__,Logs::LEVEL_INFO,"[cntId=0x%08" PRIX64 "] Received TCP/IP connection from '%s' to published service %s:%" PRIu16,cntId, remotePair,servServer->getListeningHost().c_str(),servServer->getPort() );
 
     auto pooledUplinkConnection = Uplink_Server::getPublishedServiceConnectionPool(servServer->getPoolName())->getConnectionUplink();
 
     if (!pooledUplinkConnection.uplinkSocket)
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"[cntId=0x%08" PRIX64 "] TCP/IP Connection from %s at published service %s:%" PRIu16 " failed: Empty Uplink Pool", cntId, remotePair,
+        LOG_APP->log0(__func__,Logs::LEVEL_WARN,"[cntId=0x%08" PRIX64 "] TCP/IP Connection from %s at published service %s:%" PRIu16 " failed: Empty Uplink Pool", cntId, remotePair,
                                    servServer->getListeningHost().c_str(),servServer->getPort() );
         return true;
     }
@@ -73,18 +73,18 @@ bool Service_Server::pubClientHandler(void *obj, Mantids::Network::Streams::Stre
 
     if (ok == 1)
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"[cntId=0x%08" PRIX64 "]->[upCntId=0x%08" PRIX64 "] Remotely Established Connection at uplink", cntId, pooledUplinkConnection.upCntId );
-        StreamSocketsBridge bridge;
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO,"[cntId=0x%08" PRIX64 "]->[upCntId=0x%08" PRIX64 "] Remotely Established Connection at uplink", cntId, pooledUplinkConnection.upCntId );
+        Bridge bridge;
         bridge.setToCloseRemotePeer(false);
         bridge.setPeer(0,pooledUplinkConnection.uplinkSocket);
         bridge.setPeer(1,tcp);
         bridge.process();
 
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_INFO,"[cntId=0x%08" PRIX64 "]->[upCntId=0x%08" PRIX64 "] Remotely Established Connection Finished", cntId, pooledUplinkConnection.upCntId  );
+        LOG_APP->log0(__func__,Logs::LEVEL_INFO,"[cntId=0x%08" PRIX64 "]->[upCntId=0x%08" PRIX64 "] Remotely Established Connection Finished", cntId, pooledUplinkConnection.upCntId  );
     }
     else
     {
-        Globals::getAppLog()->log0(__func__,Logs::LEVEL_WARN,"[cntId=0x%08" PRIX64 "]->[upCntId=0x%08" PRIX64 "] Connection from %s at published service %s:%" PRIu16 " failed to be established at uplink ",cntId, pooledUplinkConnection.upCntId,
+        LOG_APP->log0(__func__,Logs::LEVEL_WARN,"[cntId=0x%08" PRIX64 "]->[upCntId=0x%08" PRIX64 "] Connection from %s at published service %s:%" PRIu16 " failed to be established at uplink ",cntId, pooledUplinkConnection.upCntId,
                                    remotePair,servServer->getListeningHost().c_str(),servServer->getPort()  );
     }
 
