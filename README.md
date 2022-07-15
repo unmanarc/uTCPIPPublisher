@@ -18,12 +18,30 @@ Main License: LGPLv3
 ### Simple installation guide for Fedora/RHEL:
 
 - Proceed to activate our repo's and download/install uTCPIPPublisher:
-```bash
-# NOTE: for RHEL7 replace dnf by yum
-dnf copr enable amizrachi/unmanarc
 
+RHEL7:
+```bash
+# Install EPEL Repo
+yum -y install epel-release
+yum -y install yum-plugin-copr
+
+# Install unmanarc's copr
+yum copr enable amizrachi/unmanarc -y
+yum -y install uTCPIPPublisher
+```
+
+RHEL8:
+```bash
+# Install EPEL Repo
+dnf -y install 'dnf-command(config-manager)'
+dnf config-manager --set-enabled powertools
+dnf -y install epel-release
+
+# Install unmanarc's copr
+dnf copr enable amizrachi/unmanarc -y
 dnf -y install uTCPIPPublisher
 ```
+
 
 - Once installed, you can continue by activating/enabling the service as client:
 ```bash
