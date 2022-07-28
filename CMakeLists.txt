@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.12)
 include(GNUInstallDirs)
 
 set(APP_NAME "uTCPIPPublisher")
-set(SVERSION 1.1.0)
+set(SVERSION 1.1.2)
 
 project(${APP_NAME})
 project(${PROJECT_NAME} VERSION ${SVERSION} DESCRIPTION "Unmanarc's TCP/IP Local Port Publisher")
