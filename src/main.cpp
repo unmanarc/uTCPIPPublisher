@@ -10,6 +10,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <sys/stat.h>
 
 using namespace boost;
 
