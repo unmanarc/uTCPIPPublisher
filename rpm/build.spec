@@ -1,5 +1,5 @@
 %define name uTCPIPPublisher
-%define version 1.1.3
+%define version 1.1.4
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
 
 Name:           %{name}
@@ -33,9 +33,9 @@ Group:          Applications/Internet
 %define debug_package %{nil}
 %endif
 
-BuildRequires: libMantids-devel >= 2.7.2
+BuildRequires: libMantids-devel >= 2.7.3
 BuildRequires:  %{cmake} systemd openssl-devel zlib-devel boost-devel gcc-c++
-Requires: libMantids >= 2.7.2
+Requires: libMantids >= 2.7.3
 Requires: zlib openssl
 
 %description

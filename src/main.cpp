@@ -102,7 +102,27 @@ public:
         boost::property_tree::ptree pRunningConfig;
 
         if (!access((configFile).c_str(),R_OK))
+        {
+            struct stat stats;
+            // Check file properties...
+            stat((configFile).c_str(), &stats);
+
+            int smode = stats.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+
+            if ( smode != 0600 )
+            {
+                initLog.log0(__func__,Logs::LEVEL_WARN, "config file permissions are not 0600 and some secret values may be exposed, changing...");
+
+                if (chmod((configFile).c_str(),0600))
+                {
+                    initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Configuration file permissions can't be changed to 0600");
+                    return false;
+                }
+                initLog.log0(__func__,Logs::LEVEL_INFO, "config file permissions changed to 0600");
+            }
+
             boost::property_tree::ini_parser::read_ini((configFile).c_str(),pRunningConfig);
+        }
         else
         {
             initLog.log0(__func__,Logs::LEVEL_CRITICAL, "Missing configuration: %s", (configFile).c_str());
